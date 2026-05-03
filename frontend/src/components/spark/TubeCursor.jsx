@@ -1,98 +1,93 @@
 import React, { useEffect, useRef } from "react";
 
 /**
- * TubeCursor — lightweight canvas-based cursor trail that draws glowing
- * "tubes" in SPARK colors. Subtle, performant, no external deps.
+ * TubeCursor — real WebGL/WebGPU tubes cursor powered by threejs-components.
+ * Loaded dynamically from CDN so no npm install is required.
+ *
+ * Renders a fixed full-screen canvas behind the page content (pointer-events
+ * disabled). Drop-in compatible with the previous TubeCursor API.
  */
 export default function TubeCursor({
   initialColors = ["#2F347D", "#27306B", "#A92A2E", "#C63A3A"],
   lightColors = ["#C63A3A", "#A92A2E", "#2F347D", "#F8F9FB"],
   lightIntensity = 220,
+  enableRandomizeOnClick = false,
+  className = "",
 }) {
   const canvasRef = useRef(null);
+  const appRef = useRef(null);
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    let dpr = Math.max(1, window.devicePixelRatio || 1);
-    let w = 0, h = 0;
-    const points = [];
-    const maxPoints = 28;
-    const mouse = { x: -9999, y: -9999, vx: 0, vy: 0, lastX: 0, lastY: 0 };
-    let raf;
-    let hue = 0;
+    let removeClick = null;
+    let destroyed = false;
 
-    const resize = () => {
-      w = canvas.clientWidth;
-      h = canvas.clientHeight;
-      canvas.width = w * dpr;
-      canvas.height = h * dpr;
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    };
+    (async () => {
+      try {
+        const mod = await import(
+          /* webpackIgnore: true */
+          "https://cdn.jsdelivr.net/npm/threejs-components@0.0.19/build/cursors/tubes1.min.js"
+        );
+        const TubesCursorCtor = mod.default ?? mod;
+        if (!canvasRef.current || destroyed) return;
 
-    const onMove = (e) => {
-      mouse.vx = e.clientX - mouse.lastX;
-      mouse.vy = e.clientY - mouse.lastY;
-      mouse.lastX = e.clientX;
-      mouse.lastY = e.clientY;
-      mouse.x = e.clientX;
-      mouse.y = e.clientY;
-      points.push({ x: e.clientX, y: e.clientY, life: 1 });
-      if (points.length > maxPoints) points.shift();
-    };
+        const app = TubesCursorCtor(canvasRef.current, {
+          tubes: {
+            colors: initialColors,
+            lights: {
+              intensity: lightIntensity,
+              colors: lightColors,
+            },
+          },
+        });
+        appRef.current = app;
 
-    const tick = () => {
-      ctx.clearRect(0, 0, w, h);
-      // ambient floating tubes
-      hue = (hue + 0.4) % 360;
-
-      // draw connections
-      for (let i = 1; i < points.length; i++) {
-        const p0 = points[i - 1];
-        const p1 = points[i];
-        const t = i / points.length;
-        const c1 = initialColors[i % initialColors.length];
-        const c2 = lightColors[i % lightColors.length];
-        const grad = ctx.createLinearGradient(p0.x, p0.y, p1.x, p1.y);
-        grad.addColorStop(0, c1);
-        grad.addColorStop(1, c2);
-        ctx.strokeStyle = grad;
-        ctx.lineWidth = 1.5 + t * 6;
-        ctx.shadowColor = c2;
-        ctx.shadowBlur = (lightIntensity / 220) * 22 * t;
-        ctx.lineCap = "round";
-        ctx.beginPath();
-        ctx.moveTo(p0.x, p0.y);
-        ctx.lineTo(p1.x, p1.y);
-        ctx.stroke();
-        p1.life *= 0.98;
+        if (enableRandomizeOnClick) {
+          const handler = () => {
+            const c = randomColors(initialColors.length);
+            const l = randomColors(lightColors.length);
+            app.tubes.setColors(c);
+            app.tubes.setLightsColors(l);
+          };
+          document.body.addEventListener("click", handler);
+          removeClick = () =>
+            document.body.removeEventListener("click", handler);
+        }
+      } catch (err) {
+        // CDN unavailable — fail silently; page still works without cursor fx
+        // eslint-disable-next-line no-console
+        console.warn("[TubeCursor] failed to load", err);
       }
+    })();
 
-      // fade out tail
-      for (let i = 0; i < points.length; i++) points[i].life *= 0.97;
-      while (points.length && points[0].life < 0.05) points.shift();
-
-      raf = requestAnimationFrame(tick);
-    };
-
-    resize();
-    window.addEventListener("resize", resize);
-    window.addEventListener("mousemove", onMove);
-    raf = requestAnimationFrame(tick);
     return () => {
-      cancelAnimationFrame(raf);
-      window.removeEventListener("resize", resize);
-      window.removeEventListener("mousemove", onMove);
+      destroyed = true;
+      if (removeClick) removeClick();
+      try {
+        appRef.current?.dispose?.();
+        appRef.current = null;
+      } catch {
+        /* ignore */
+      }
     };
-  }, [initialColors, lightColors, lightIntensity]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <canvas
       ref={canvasRef}
       data-testid="tube-cursor"
-      className="pointer-events-none fixed inset-0 z-[5] mix-blend-screen"
-      style={{ width: "100vw", height: "100vh" }}
+      className={`fixed inset-0 block h-full w-full pointer-events-none ${className}`}
+      style={{ zIndex: 30, mixBlendMode: "screen", opacity: 0.6 }}
     />
+  );
+}
+
+function randomColors(count) {
+  return new Array(count).fill(0).map(
+    () =>
+      "#" +
+      Math.floor(Math.random() * 16777215)
+        .toString(16)
+        .padStart(6, "0")
   );
 }
