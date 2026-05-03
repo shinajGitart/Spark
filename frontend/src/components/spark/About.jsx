@@ -1,7 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ShieldCheck, Award, Factory } from "lucide-react";
 import SectionLabel from "./SectionLabel";
+
+import pic1 from "../we/homepic1.jpg";
+import pic2 from "../we/homepic2.jpg";
+import pic3 from "../we/homepic3.jpg";
+import pic4 from "../we/homwpic4.jpg";
+import pic5 from "../we/homepic5.jpg";
 
 /**
  * Background slideshow with elegant gradient fallbacks if image files don't exist.
@@ -11,45 +16,42 @@ const SLIDES = [
   {
     grad:
       "radial-gradient(ellipse at 30% 30%, #2F347D 0%, transparent 55%), radial-gradient(ellipse at 70% 70%, #A92A2E 0%, transparent 55%), linear-gradient(135deg, #0d1230, #1a0e1c)",
-    src: "/homepic1.jpg",
+    src: pic1,
   },
   {
     grad:
       "radial-gradient(ellipse at 70% 30%, #C63A3A 0%, transparent 55%), radial-gradient(ellipse at 30% 70%, #27306B 0%, transparent 55%), linear-gradient(135deg, #1a0d10, #0d1230)",
-    src: "/homepic2.jpg",
+    src: pic2,
   },
   {
     grad:
       "radial-gradient(ellipse at 50% 50%, #2F347D 0%, transparent 60%), linear-gradient(135deg, #090B1A, #1a1230)",
-    src: "/homepic3.jpg",
+    src: pic3,
   },
   {
     grad:
       "radial-gradient(ellipse at 20% 80%, #A92A2E 0%, transparent 60%), linear-gradient(135deg, #0d1230, #090B1A)",
-    src: "/homepic4.jpg",
+    src: pic4,
   },
   {
     grad:
       "radial-gradient(ellipse at 80% 20%, #C63A3A 0%, transparent 55%), radial-gradient(ellipse at 20% 80%, #2F347D 0%, transparent 55%), linear-gradient(135deg, #090B1A, #150a14)",
-    src: "/homepic5.jpg",
+    src: pic5,
   },
 ];
 
 const cards = [
   {
-    icon: Factory,
     title: "Saudi-Based Industrial Partner",
     body: "Headquartered in Dammam, embedded in Saudi Arabia's industrial heartland.",
     image: "/card-industrial.jpg",
   },
   {
-    icon: Award,
     title: "Quality-Driven Supply & Services",
     body: "Premium-grade products, pre-vetted vendors and rigorous quality checkpoints.",
     image: "/card-quality.jpg",
   },
   {
-    icon: ShieldCheck,
     title: "Supporting Major Industrial Sectors",
     body: "From oil & gas and petrochemicals to energy, environment, safety and warehousing.",
     image: "/card-oilgas.jpg",
@@ -59,7 +61,7 @@ const cards = [
 export default function About() {
   const [i, setI] = useState(0);
   useEffect(() => {
-    const t = setInterval(() => setI((v) => (v + 1) % SLIDES.length), 4000);
+    const t = setInterval(() => setI((v) => (v + 1) % SLIDES.length), 3000);
     return () => clearInterval(t);
   }, []);
 
@@ -77,21 +79,22 @@ export default function About() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 0.5 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 1.6, ease: "easeInOut" }}
+            transition={{ duration: 1.8, ease: "easeInOut" }}
             className="absolute inset-0"
             style={{
               backgroundImage: `url(${SLIDES[i].src}), ${SLIDES[i].grad}`,
               backgroundSize: "cover",
               backgroundPosition: "center",
+              backgroundRepeat: "no-repeat",
             }}
           />
         </AnimatePresence>
-        {/* dark overlay */}
+        {/* dark overlay — keeps text crisp, allows 50% image visibility */}
         <div
           className="absolute inset-0"
           style={{
             background:
-              "linear-gradient(180deg, rgba(9,11,26,0.85) 0%, rgba(9,11,26,0.78) 50%, rgba(9,11,26,0.95) 100%)",
+              "linear-gradient(180deg, rgba(9,11,26,0.75) 0%, rgba(9,11,26,0.62) 40%, rgba(9,11,26,0.82) 100%)",
           }}
         />
         <div className="absolute inset-0 grain" />
@@ -142,7 +145,6 @@ export default function About() {
 
         <div className="mt-14 grid md:grid-cols-3 gap-5">
           {cards.map((c, idx) => {
-            const Icon = c.icon;
             return (
               <motion.div
                 key={c.title}
@@ -151,9 +153,9 @@ export default function About() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.2 }}
                 transition={{ duration: 0.7, delay: idx * 0.12, ease: [0.22, 1, 0.36, 1] }}
-                className="group relative p-7 rounded-2xl glass-strong overflow-hidden min-h-[260px]"
+                className="group relative p-7 rounded-2xl glass-strong overflow-hidden min-h-[220px]"
               >
-                {/* card background image @ ~50% with gradient for readability */}
+                {/* card background image */}
                 <div
                   aria-hidden
                   className="absolute inset-0 rounded-2xl opacity-50 transition-opacity duration-500 group-hover:opacity-60"
@@ -190,17 +192,7 @@ export default function About() {
                     padding: 1,
                   }}
                 />
-                <div className="relative z-10">
-                  <div
-                    className="w-11 h-11 rounded-xl grid place-items-center mb-5"
-                    style={{
-                      background:
-                        "linear-gradient(135deg,#C63A3A33,#2F347D44)",
-                      border: "1px solid rgba(217,217,222,0.18)",
-                    }}
-                  >
-                    <Icon size={20} className="text-[#F8F9FB]" />
-                  </div>
+                <div className="relative z-10 flex flex-col justify-end h-full pt-10">
                   <h3 className="font-display text-lg font-semibold leading-snug">
                     {c.title}
                   </h3>

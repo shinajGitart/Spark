@@ -20,6 +20,7 @@ html, body, #root {
 
 html {
   scroll-behavior: smooth;
+  scroll-padding-top: 80px;
   -webkit-text-size-adjust: 100%;
 }
 
@@ -39,6 +40,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
+  overscroll-behavior-y: none;
 }
 
 /* subtle global ambient glow — lifts the overall darkness without flattening */

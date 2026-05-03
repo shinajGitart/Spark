@@ -22,7 +22,7 @@ export default function TubeCursor({
     let w = 0, h = 0;
     const dpr = Math.min(2, Math.max(1, window.devicePixelRatio || 1));
     const points = [];
-    const maxPoints = 24;
+    const maxPoints = 10;   // short trail — snappy, not draggy
     let raf;
     let running = true;
 
@@ -54,16 +54,25 @@ export default function TubeCursor({
         grad.addColorStop(0, c1);
         grad.addColorStop(1, c2);
         ctx.strokeStyle = grad;
-        ctx.lineWidth = 1.2 + t * 5.5;
-        ctx.shadowColor = c2;
-        ctx.shadowBlur = (lightIntensity / 220) * 18 * t;
+        ctx.lineWidth = 1.0 + t * 3.5;   // max ~4.5 (was up to 6.7)
+        // Only add shadowBlur on the freshest (brightest) segments
+        if (t > 0.6) {
+          ctx.shadowColor = c2;
+          ctx.shadowBlur = t * 8;          // max 8 (was 18)
+        } else {
+          ctx.shadowBlur = 0;
+        }
         ctx.lineCap = "round";
+        ctx.globalAlpha = t * 0.85;        // fade older segments
         ctx.beginPath();
         ctx.moveTo(p0.x, p0.y);
         ctx.lineTo(p1.x, p1.y);
         ctx.stroke();
       }
-      for (let i = 0; i < points.length; i++) points[i].life *= 0.94;
+      ctx.shadowBlur = 0;
+      ctx.globalAlpha = 1;
+      // fast decay — trail disappears in ~18 frames instead of ~75
+      for (let i = 0; i < points.length; i++) points[i].life *= 0.88;
       while (points.length && points[0].life < 0.04) points.shift();
       raf = requestAnimationFrame(tick);
     };
@@ -97,7 +106,7 @@ export default function TubeCursor({
       style={{
         zIndex: 30,
         mixBlendMode: "screen",
-        opacity: 0.75,
+        opacity: 0.55,
         willChange: "contents",
       }}
     />

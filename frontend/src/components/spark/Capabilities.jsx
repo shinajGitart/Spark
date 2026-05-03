@@ -1,4 +1,5 @@
 import React from "react";
+import FlowFieldBackground from "../ui/FlowFieldBackground";
 import { motion } from "framer-motion";
 import {
   Beaker,
@@ -197,32 +198,49 @@ export default function Capabilities() {
       data-testid="capabilities-section"
       className="relative py-24 lg:py-32 overflow-hidden"
     >
+      {/* ── Flow-field particle background – Capabilities section only ── */}
+      <div className="absolute inset-0 z-0 pointer-events-none" style={{ opacity: 0.52 }}>
+        <FlowFieldBackground
+          color="#B22F32"
+          secondaryColor="#2F347D"
+          trailOpacity={0.12}
+          particleCount={520}
+          speed={0.7}
+        />
+      </div>
+
+      {/* dark overlay — clean #090B1A base, no grey wash */}
       <div
-        className="absolute inset-0 pointer-events-none opacity-60"
+        className="absolute inset-0 z-[1] pointer-events-none"
+        style={{
+          background: "rgba(9,11,26,0.48)",
+        }}
+      />
+
+      <div
+        className="absolute inset-0 z-[2] pointer-events-none opacity-60"
         style={{
           background:
             "radial-gradient(60% 50% at 50% 0%, rgba(47,52,125,0.18), transparent 70%)",
         }}
       />
-      <div className="relative max-w-7xl mx-auto px-6">
-        <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-10">
-          <div>
-            <SectionLabel>Core Capabilities</SectionLabel>
-            <h2 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold mt-5 leading-[1.05] max-w-2xl">
-              Solutions{" "}
-              <span
-                style={{
-                  backgroundImage: "linear-gradient(120deg,#C63A3A,#F8F9FB,#2F347D)",
-                  WebkitBackgroundClip: "text",
-                  backgroundClip: "text",
-                  color: "transparent",
-                }}
-              >
-                we provide.
-              </span>
-            </h2>
-          </div>
-          <p className="text-[#D9D9DE]/80 max-w-md text-sm leading-relaxed">
+      <div className="relative z-10 max-w-7xl mx-auto px-6">
+        <div className="flex flex-col gap-5 mb-10">
+          <SectionLabel>Core Capabilities</SectionLabel>
+          <h2 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold mt-2 leading-[1.05] max-w-2xl">
+            Solutions{" "}
+            <span
+              style={{
+                backgroundImage: "linear-gradient(120deg,#C63A3A,#F8F9FB,#2F347D)",
+                WebkitBackgroundClip: "text",
+                backgroundClip: "text",
+                color: "transparent",
+              }}
+            >
+              we provide.
+            </span>
+          </h2>
+          <p className="text-[#D9D9DE]/80 max-w-xl text-sm leading-relaxed">
             One contract. Eight specialised industrial service lines, engineered
             around uptime, safety and procurement excellence.
           </p>

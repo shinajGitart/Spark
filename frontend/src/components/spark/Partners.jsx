@@ -2,10 +2,51 @@ import React from "react";
 import { motion } from "framer-motion";
 import SectionLabel from "./SectionLabel";
 
-/**
- * BrandTile — premium monogram logo-style tile.
- * Uses initials + a subtle accent bar. Monochrome silver/white treatment.
- */
+import KaydonLogo from "../partners/Kaydon.png";
+import CentralLogo from "../partners/central.png";
+import AutoLogo from "../partners/auto.png";
+import EcoLogo from "../partners/eco.png";
+import HeadLogo from "../partners/head.png";
+
+/* ─── Global Partner logo tile ─────────────────────────────────────── */
+function LogoTile({ name, logo, href, accent = "#C63A3A" }) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={`Visit ${name}`}
+      data-testid={`logo-tile-${name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}
+      className="group relative flex items-center justify-center pl-4 pr-4 py-3 rounded-xl glass min-w-[220px] h-[66px] transition-all duration-300 hover:-translate-y-0.5 hover:border-[rgba(217,217,222,0.28)] cursor-pointer no-underline"
+      style={{
+        boxShadow: "none",
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.boxShadow = `0 0 18px ${accent}44, 0 4px 24px rgba(0,0,0,0.35)`;
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.boxShadow = "none";
+      }}
+    >
+      {/* subtle accent shimmer on hover */}
+      <span
+        aria-hidden
+        className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+        style={{
+          background: `radial-gradient(ellipse at 50% 50%, ${accent}18, transparent 70%)`,
+        }}
+      />
+      <img
+        src={logo}
+        alt={name}
+        className="relative max-h-[38px] max-w-[150px] w-auto h-auto object-contain brightness-100 group-hover:brightness-110 transition-all duration-300"
+        draggable={false}
+      />
+    </a>
+  );
+}
+
+/* ─── Approved Vendor monogram tile (unchanged) ─────────────────────── */
 function BrandTile({ name, mono, accent = "#C63A3A" }) {
   return (
     <div
@@ -42,7 +83,7 @@ function BrandTile({ name, mono, accent = "#C63A3A" }) {
           {name}
         </span>
         <span className="text-[9.5px] uppercase tracking-[0.24em] text-[#D9D9DE]/55">
-          Partner
+          Vendor
         </span>
       </div>
     </div>
@@ -57,13 +98,39 @@ const mono = (n) => {
   return (parts[0][0] + parts[1][0]).toUpperCase();
 };
 
+/* ─── Data ───────────────────────────────────────────────────────────── */
 const globalsData = [
-  { name: "Kaydon Filtration", accent: "#C63A3A" },
-  { name: "Central Automotive Products", accent: "#2F347D" },
-  { name: "Chubu Techno", accent: "#A92A2E" },
-  { name: "Autonomy Dynamics", accent: "#27306B" },
-  { name: "Eco Environmental", accent: "#C63A3A" },
-].map((x) => ({ ...x, mono: mono(x.name) }));
+  {
+    name: "Kaydon Filtration",
+    logo: KaydonLogo,
+    href: "https://www.kaydonfiltration.com/",
+    accent: "#C63A3A",
+  },
+  {
+    name: "Central Automotive Products",
+    logo: CentralLogo,
+    href: "https://www.central-auto.co.jp/en/index.html",
+    accent: "#2F347D",
+  },
+  {
+    name: "Autonomy Dynamics",
+    logo: AutoLogo,
+    href: "https://autonomydynamics.com/en/",
+    accent: "#27306B",
+  },
+  {
+    name: "Eco Environmental",
+    logo: EcoLogo,
+    href: "https://eco.yikeou.com/",
+    accent: "#C63A3A",
+  },
+  {
+    name: "Chubu Techno",
+    logo: HeadLogo,
+    href: "https://en.c-techno.co.jp/",
+    accent: "#A92A2E",
+  },
+];
 
 const vendorsData = [
   { name: "Aramco", accent: "#C63A3A" },
@@ -84,19 +151,32 @@ const vendorsData = [
   { name: "Boutique Group", accent: "#A92A2E" },
 ].map((x) => ({ ...x, mono: mono(x.name) }));
 
-function Marquee({ items, direction = "forward", speed = 70 }) {
+/* ─── Marquee ────────────────────────────────────────────────────────── */
+function Marquee({ items, direction = "forward", speed = 70, type = "vendor" }) {
+  // duplicate for seamless loop
   const arr = [...items, ...items];
   const cls =
     direction === "forward" ? "marquee-track-fwd" : "marquee-track-rev";
+
   return (
     <div className="relative overflow-hidden mask-fade">
       <div
         className={`flex gap-3 whitespace-nowrap w-max ${cls}`}
         style={{ animationDuration: `${speed}s` }}
       >
-        {arr.map((b, i) => (
-          <BrandTile key={i} name={b.name} mono={b.mono} accent={b.accent} />
-        ))}
+        {type === "logo"
+          ? arr.map((b, i) => (
+              <LogoTile
+                key={i}
+                name={b.name}
+                logo={b.logo}
+                href={b.href}
+                accent={b.accent}
+              />
+            ))
+          : arr.map((b, i) => (
+              <BrandTile key={i} name={b.name} mono={b.mono} accent={b.accent} />
+            ))}
       </div>
 
       <style>{`
@@ -114,6 +194,7 @@ function Marquee({ items, direction = "forward", speed = 70 }) {
   );
 }
 
+/* ─── Section ────────────────────────────────────────────────────────── */
 export default function Partners() {
   return (
     <section
@@ -155,23 +236,31 @@ export default function Partners() {
         </motion.div>
 
         <div className="mt-14 space-y-3">
+          {/* ── Global Partners ── */}
           <div className="flex items-center gap-3 ml-1 mb-4">
-            <span className="inline-block h-[14px] w-[2px]" style={{ background: "#C63A3A", boxShadow: "0 0 10px #C63A3A" }} />
+            <span
+              className="inline-block h-[14px] w-[2px]"
+              style={{ background: "#C63A3A", boxShadow: "0 0 10px #C63A3A" }}
+            />
             <span className="text-[11px] uppercase tracking-[0.28em] text-[#D9D9DE]/85 font-medium">
               Global Partners
             </span>
           </div>
-          <Marquee items={globalsData} direction="forward" speed={55} />
+          <Marquee items={globalsData} direction="forward" speed={55} type="logo" />
 
+          {/* ── Approved Vendors ── */}
           <div className="flex items-center gap-3 ml-1 mt-10 mb-4">
-            <span className="inline-block h-[14px] w-[2px]" style={{ background: "#2F347D", boxShadow: "0 0 10px #2F347D" }} />
+            <span
+              className="inline-block h-[14px] w-[2px]"
+              style={{ background: "#2F347D", boxShadow: "0 0 10px #2F347D" }}
+            />
             <span className="text-[11px] uppercase tracking-[0.28em] text-[#D9D9DE]/85 font-medium">
               Approved Vendors
             </span>
           </div>
-          <Marquee items={vendorsData} direction="forward" speed={85} />
+          <Marquee items={vendorsData} direction="forward" speed={85} type="vendor" />
           <div className="mt-3">
-            <Marquee items={vendorsData} direction="reverse" speed={95} />
+            <Marquee items={vendorsData} direction="reverse" speed={95} type="vendor" />
           </div>
         </div>
       </div>
