@@ -14,18 +14,29 @@ Rebuild the SPARK / Sharara Renewable Energy Co. homepage as a premium 2026 mode
 
 ## Implementation (2026-01)
 - `/src/index.css` rebuilt with brand tokens, grain, glow, marquee, sweep, draw-bolt, hue-shift keyframes
+- Added `scroll-behavior: smooth` + reduced-motion media query + global ambient glow pseudo-element for slight brightness lift
+- Glass cards brightened (background 0.06→0.085 strong, border 0.12→0.16) for better visibility without losing premium dark feel
 - `/src/components/spark/`
-  - `TubeCursor.jsx` — canvas-based glowing cursor trail (initial+light colors as specified)
-  - `SparkMark.jsx` — animated SVG lightning-bolt logo (gradient, rotating ring, pulse)
+  - `TubeCursor.jsx` — lightweight DPR-aware canvas trail, disabled on coarse-pointer (mobile) for battery, pauses on tab hidden
+  - `SparkMark.jsx` — GPU-friendly: static soft radial halo + subtle scale breathing, single dashed orbit ring, `will-change: transform`, no `filter: blur` animation
+  - `SectionLabel.jsx` — replaces all pill/capsule badges site-wide with accent-line + uppercase micro-label treatment
   - `Navbar.jsx` — sticky glass navbar with scroll blur, mobile menu
-  - `Hero.jsx` — full-screen hero, gradient glows, drifting blobs, lightning SVG paths, particles, grid mask, animated headline gradient, stats
-  - `About.jsx` — slideshow background (gradient fallbacks since `/homepic*` missing) with #090B1A overlay, 3 glass cards, scroll reveal
-  - `Capabilities.jsx` — 8 single animated showcase rows (NOT cards); alternating sides, big numerals, orbiting rings, lightning sweep, icon orb
+  - `Hero.jsx` — hero with gradient glows, drifting blobs, lightning SVG paths, particles (reduced 28→18), grid mask, smooth circular orbit (rotate-based, GPU)
+  - `About.jsx` — slideshow background + each card now has a relevant Unsplash image (served locally from `/public/card-*.jpg`) at 50% opacity with dark gradient overlay for readability
+  - `Capabilities.jsx` — 8 single animated showcase rows (not cards); alternating sides, big numerals, orbiting rings, icon orb
   - `Sectors.jsx` — 8 sector chips, staggered reveal
-  - `Partners.jsx` — two marquee tracks (forward + reverse) with mask-fade, glass pills
-  - `CtaFooter.jsx` — gradient-bordered CTA card + footer with contact details
-- `App.js` simplified to render `<Home>` with TubeCursor + sections
+  - `Partners.jsx` — rebuilt with `BrandTile` component (monogram badge + name + accent bar), forward + reverse marquees, mask-fade edges
+  - `CtaFooter.jsx` — gradient-bordered CTA card + footer
+- `App.js` renders `<Home>` with TubeCursor + sections
 - `public/index.html` title + theme-color updated
+- `public/card-{industrial,quality,oilgas}.jpg` — local Unsplash-sourced card imagery
+
+## Polish / refinements (2026-01 pass 2)
+- All capsule/pill badges replaced with clean `│ SECTION LABEL` treatment (accent line + uppercase)
+- Body text contrast lifted (`/75 /80` → `/85 /90`) for readability
+- Ambient radial blue/red body glow lifts overall brightness while preserving dark premium aesthetic
+- Marquee/animation easings unified; reduced-motion support
+- Reverted WebGL cursor to lightweight canvas version for performance (no framebuffer/GPU stall issues)
 
 ## What Works
 - Hero, About slideshow, Capabilities showcase rows, Sectors, Partners marquee, CTA, Footer all render and animate

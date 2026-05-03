@@ -10,6 +10,7 @@ import {
   LineChart,
   Drill,
 } from "lucide-react";
+import SectionLabel from "./SectionLabel";
 
 const items = [
   {
@@ -110,7 +111,7 @@ function Row({ item, idx }) {
           {item.title}
         </motion.h3>
         <motion.p
-          className="mt-4 text-[#D9D9DE]/75 max-w-xl text-base leading-relaxed"
+          className="mt-4 text-[#D9D9DE]/85 max-w-xl text-base leading-relaxed"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
@@ -206,9 +207,7 @@ export default function Capabilities() {
       <div className="relative max-w-7xl mx-auto px-6">
         <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-10">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full glass text-[11px] uppercase tracking-[0.22em] text-[#D9D9DE]/80">
-              <span className="w-1 h-1 rounded-full bg-[#C63A3A]" /> Core Capabilities
-            </div>
+            <SectionLabel>Core Capabilities</SectionLabel>
             <h2 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold mt-5 leading-[1.05] max-w-2xl">
               Solutions{" "}
               <span
@@ -223,7 +222,7 @@ export default function Capabilities() {
               </span>
             </h2>
           </div>
-          <p className="text-[#D9D9DE]/70 max-w-md text-sm leading-relaxed">
+          <p className="text-[#D9D9DE]/80 max-w-md text-sm leading-relaxed">
             One contract. Eight specialised industrial service lines, engineered
             around uptime, safety and procurement excellence.
           </p>

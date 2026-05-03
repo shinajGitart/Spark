@@ -1,45 +1,115 @@
 import React from "react";
 import { motion } from "framer-motion";
+import SectionLabel from "./SectionLabel";
 
-const globals = [
-  "Kaydon Filtration",
-  "Central Automotive Products",
-  "Chubu Techno",
-  "Autonomy Dynamics",
-  "Eco Environmental",
-];
-
-const vendors = [
-  "Aramco","Saudi Energy","NEOM","Red Sea Global","KAFD","SABIC","SEVEN","ROSHN",
-  "Ma'aden","SWCC","Sadara","YASREF","ADNOC","Bahri","Matarat","Boutique Group",
-];
-
-function Marquee({ items, speed = "slow", testid }) {
-  const arr = [...items, ...items];
+/**
+ * BrandTile — premium monogram logo-style tile.
+ * Uses initials + a subtle accent bar. Monochrome silver/white treatment.
+ */
+function BrandTile({ name, mono, accent = "#C63A3A" }) {
   return (
-    <div className="relative overflow-hidden mask-fade" data-testid={testid}>
+    <div
+      className="group relative flex items-center gap-4 pl-3 pr-5 py-3 rounded-xl glass min-w-[220px] transition-all duration-300 hover:-translate-y-0.5"
+      data-testid={`brand-tile-${name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}
+    >
+      {/* monogram badge */}
       <div
-        className={`flex gap-3 whitespace-nowrap w-max ${
-          speed === "slow" ? "marquee-track-slow" : "marquee-track"
-        }`}
+        className="relative w-11 h-11 rounded-lg grid place-items-center overflow-hidden shrink-0"
+        style={{
+          background:
+            "linear-gradient(135deg, rgba(255,255,255,0.09), rgba(255,255,255,0.02))",
+          border: "1px solid rgba(217,217,222,0.2)",
+        }}
       >
-        {arr.map((name, i) => (
-          <div
-            key={i}
-            className="px-5 py-3 rounded-full glass text-sm text-[#D9D9DE]/90 flex items-center gap-2"
-          >
-            <span
-              className="w-1.5 h-1.5 rounded-full"
-              style={{
-                background:
-                  i % 2 ? "#C63A3A" : "#2F347D",
-                boxShadow: `0 0 10px ${i % 2 ? "#C63A3A" : "#2F347D"}`,
-              }}
-            />
-            <span className="font-display font-medium tracking-wide">{name}</span>
-          </div>
+        <span
+          aria-hidden
+          className="absolute inset-0 opacity-60 transition-opacity group-hover:opacity-100"
+          style={{
+            background: `radial-gradient(circle at 30% 20%, ${accent}44, transparent 70%)`,
+          }}
+        />
+        <span className="relative font-display font-bold text-[13px] tracking-tight text-[#F8F9FB]">
+          {mono}
+        </span>
+        <span
+          className="absolute bottom-0 left-1.5 right-1.5 h-[2px] rounded-full"
+          style={{ background: accent, opacity: 0.75 }}
+        />
+      </div>
+
+      <div className="flex flex-col leading-tight">
+        <span className="font-display font-semibold text-[13.5px] text-[#F8F9FB] tracking-tight">
+          {name}
+        </span>
+        <span className="text-[9.5px] uppercase tracking-[0.24em] text-[#D9D9DE]/55">
+          Partner
+        </span>
+      </div>
+    </div>
+  );
+}
+
+// helper — derive monogram
+const mono = (n) => {
+  const cleaned = n.replace(/['']/g, "");
+  const parts = cleaned.split(/\s+/);
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[1][0]).toUpperCase();
+};
+
+const globalsData = [
+  { name: "Kaydon Filtration", accent: "#C63A3A" },
+  { name: "Central Automotive Products", accent: "#2F347D" },
+  { name: "Chubu Techno", accent: "#A92A2E" },
+  { name: "Autonomy Dynamics", accent: "#27306B" },
+  { name: "Eco Environmental", accent: "#C63A3A" },
+].map((x) => ({ ...x, mono: mono(x.name) }));
+
+const vendorsData = [
+  { name: "Aramco", accent: "#C63A3A" },
+  { name: "Saudi Energy", accent: "#2F347D" },
+  { name: "NEOM", accent: "#A92A2E" },
+  { name: "Red Sea Global", accent: "#C63A3A" },
+  { name: "KAFD", accent: "#27306B" },
+  { name: "SABIC", accent: "#2F347D" },
+  { name: "SEVEN", accent: "#C63A3A" },
+  { name: "ROSHN", accent: "#A92A2E" },
+  { name: "Ma'aden", accent: "#27306B" },
+  { name: "SWCC", accent: "#2F347D" },
+  { name: "Sadara", accent: "#C63A3A" },
+  { name: "YASREF", accent: "#A92A2E" },
+  { name: "ADNOC", accent: "#C63A3A" },
+  { name: "Bahri", accent: "#2F347D" },
+  { name: "Matarat", accent: "#27306B" },
+  { name: "Boutique Group", accent: "#A92A2E" },
+].map((x) => ({ ...x, mono: mono(x.name) }));
+
+function Marquee({ items, direction = "forward", speed = 70 }) {
+  const arr = [...items, ...items];
+  const cls =
+    direction === "forward" ? "marquee-track-fwd" : "marquee-track-rev";
+  return (
+    <div className="relative overflow-hidden mask-fade">
+      <div
+        className={`flex gap-3 whitespace-nowrap w-max ${cls}`}
+        style={{ animationDuration: `${speed}s` }}
+      >
+        {arr.map((b, i) => (
+          <BrandTile key={i} name={b.name} mono={b.mono} accent={b.accent} />
         ))}
       </div>
+
+      <style>{`
+        @keyframes mq-fwd { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+        @keyframes mq-rev { 0%{transform:translateX(-50%)} 100%{transform:translateX(0)} }
+        .marquee-track-fwd { animation: mq-fwd linear infinite; will-change: transform; }
+        .marquee-track-rev { animation: mq-rev linear infinite; will-change: transform; }
+        .marquee-track-fwd:hover, .marquee-track-rev:hover { animation-play-state: paused; }
+        .mask-fade {
+          mask-image: linear-gradient(90deg, transparent 0%, #000 8%, #000 92%, transparent 100%);
+          -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 8%, #000 92%, transparent 100%);
+        }
+      `}</style>
     </div>
   );
 }
@@ -55,7 +125,7 @@ export default function Partners() {
         className="absolute inset-0 pointer-events-none opacity-60"
         style={{
           background:
-            "radial-gradient(60% 50% at 50% 100%, rgba(47,52,125,0.18), transparent 70%)",
+            "radial-gradient(60% 50% at 50% 100%, rgba(47,52,125,0.2), transparent 70%)",
         }}
       />
 
@@ -65,11 +135,9 @@ export default function Partners() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.3 }}
           transition={{ duration: 0.8 }}
-          className="text-center max-w-3xl mx-auto"
+          className="flex flex-col items-center text-center max-w-3xl mx-auto"
         >
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full glass text-[11px] uppercase tracking-[0.22em] text-[#D9D9DE]/80 mx-auto">
-            <span className="w-1 h-1 rounded-full bg-[#C63A3A]" /> Trust
-          </div>
+          <SectionLabel center>Trusted Network</SectionLabel>
           <h2 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold mt-5 leading-[1.05]">
             Trusted across major{" "}
             <span
@@ -86,58 +154,27 @@ export default function Partners() {
           </h2>
         </motion.div>
 
-        <div className="mt-14 space-y-5">
-          <div className="text-[11px] uppercase tracking-[0.22em] text-[#D9D9DE]/60 ml-1">
-            Global Partners
+        <div className="mt-14 space-y-3">
+          <div className="flex items-center gap-3 ml-1 mb-4">
+            <span className="inline-block h-[14px] w-[2px]" style={{ background: "#C63A3A", boxShadow: "0 0 10px #C63A3A" }} />
+            <span className="text-[11px] uppercase tracking-[0.28em] text-[#D9D9DE]/85 font-medium">
+              Global Partners
+            </span>
           </div>
-          <Marquee items={globals} speed="fast" testid="partners-marquee-global" />
+          <Marquee items={globalsData} direction="forward" speed={55} />
 
-          <div className="mt-10 text-[11px] uppercase tracking-[0.22em] text-[#D9D9DE]/60 ml-1">
-            Approved Vendors
+          <div className="flex items-center gap-3 ml-1 mt-10 mb-4">
+            <span className="inline-block h-[14px] w-[2px]" style={{ background: "#2F347D", boxShadow: "0 0 10px #2F347D" }} />
+            <span className="text-[11px] uppercase tracking-[0.28em] text-[#D9D9DE]/85 font-medium">
+              Approved Vendors
+            </span>
           </div>
-          <Marquee items={vendors} speed="slow" testid="partners-marquee-vendors" />
-          <div className="reverse-track">
-            <ReverseMarquee items={vendors} />
+          <Marquee items={vendorsData} direction="forward" speed={85} />
+          <div className="mt-3">
+            <Marquee items={vendorsData} direction="reverse" speed={95} />
           </div>
         </div>
       </div>
-
-      <style>{`
-        .mask-fade {
-          mask-image: linear-gradient(90deg, transparent 0%, #000 8%, #000 92%, transparent 100%);
-          -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 8%, #000 92%, transparent 100%);
-        }
-        .marquee-track-reverse { animation: marquee-rev 50s linear infinite; }
-        @keyframes marquee-rev {
-          0% { transform: translateX(-50%); }
-          100% { transform: translateX(0%); }
-        }
-      `}</style>
     </section>
-  );
-}
-
-function ReverseMarquee({ items }) {
-  const arr = [...items, ...items];
-  return (
-    <div className="relative overflow-hidden mask-fade">
-      <div className="flex gap-3 whitespace-nowrap w-max marquee-track-reverse">
-        {arr.map((name, i) => (
-          <div
-            key={i}
-            className="px-5 py-3 rounded-full glass text-sm text-[#D9D9DE]/90 flex items-center gap-2"
-          >
-            <span
-              className="w-1.5 h-1.5 rounded-full"
-              style={{
-                background: i % 2 ? "#2F347D" : "#C63A3A",
-                boxShadow: `0 0 10px ${i % 2 ? "#2F347D" : "#C63A3A"}`,
-              }}
-            />
-            <span className="font-display font-medium tracking-wide">{name}</span>
-          </div>
-        ))}
-      </div>
-    </div>
   );
 }

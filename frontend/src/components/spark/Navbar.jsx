@@ -57,7 +57,7 @@ export default function Navbar() {
               key={l.label}
               href={l.href}
               data-testid={`nav-link-${l.label.toLowerCase()}`}
-              className="relative px-4 py-2 text-sm text-[#D9D9DE]/85 hover:text-white transition-colors"
+              className="relative px-4 py-2 text-sm text-[#D9D9DE]/90 hover:text-white transition-colors"
             >
               <span className="relative z-10">{l.label}</span>
               <span className="absolute inset-x-3 bottom-1 h-px bg-gradient-to-r from-transparent via-[#C63A3A] to-transparent opacity-0 hover:opacity-100 transition-opacity" />

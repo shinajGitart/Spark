@@ -1,9 +1,10 @@
 import React, { useMemo } from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, MapPin, Zap } from "lucide-react";
+import { ArrowRight, Zap } from "lucide-react";
 import SparkMark from "./SparkMark";
+import SectionLabel from "./SectionLabel";
 
-function Particles({ count = 28 }) {
+function Particles({ count = 18 }) {
   const items = useMemo(
     () =>
       Array.from({ length: count }).map((_, i) => ({
@@ -134,12 +135,13 @@ export default function Hero() {
         <div className="lg:col-span-7">
           <motion.div
             {...fadeUp(0)}
-            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full glass text-xs tracking-wider uppercase text-[#D9D9DE]"
+            className="flex items-center gap-6"
           >
-            <MapPin size={12} className="text-[#C63A3A]" />
-            <span>Dammam · Saudi Arabia</span>
-            <span className="w-1 h-1 rounded-full bg-[#C63A3A]" />
-            <span className="text-[#D9D9DE]/70">Industrial Solutions</span>
+            <SectionLabel>Dammam · Saudi Arabia</SectionLabel>
+            <span className="hidden sm:block h-px w-12 bg-gradient-to-r from-[#C63A3A]/60 to-transparent" />
+            <span className="hidden sm:inline text-[11px] uppercase tracking-[0.28em] text-[#D9D9DE]/60">
+              Industrial Solutions
+            </span>
           </motion.div>
 
           <motion.h1
@@ -165,7 +167,7 @@ export default function Hero() {
 
           <motion.p
             {...fadeUp(0.2)}
-            className="mt-7 max-w-xl text-[15px] sm:text-base text-[#D9D9DE]/80 leading-relaxed"
+            className="mt-7 max-w-xl text-[15px] sm:text-base text-[#D9D9DE]/90 leading-relaxed"
           >
             Reliable procurement, MRO, maintenance, safety, environmental,
             warehouse, chemical and technical solutions powering Saudi Arabia's
@@ -237,17 +239,22 @@ export default function Hero() {
           className="lg:col-span-5 flex justify-center lg:justify-end"
         >
           <div className="relative">
-            <SparkMark size={360} className="spark-pulse" />
-            {/* orbiting dot */}
+            <SparkMark size={360} />
+            {/* orbiting dot — pure rotate for smooth circular motion */}
             <motion.div
-              className="absolute top-1/2 left-1/2 w-2 h-2 -mt-1 -ml-1 rounded-full"
-              style={{ background: "#F8F9FB", boxShadow: "0 0 12px #F8F9FB" }}
-              animate={{
-                x: [140, 0, -140, 0, 140],
-                y: [0, 140, 0, -140, 0],
-              }}
-              transition={{ duration: 9, repeat: Infinity, ease: "linear" }}
-            />
+              className="absolute top-1/2 left-1/2 w-40 h-40 -mt-20 -ml-20"
+              style={{ willChange: "transform" }}
+              animate={{ rotate: 360 }}
+              transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
+            >
+              <span
+                className="absolute top-0 left-1/2 -ml-1 w-2 h-2 rounded-full"
+                style={{
+                  background: "#F8F9FB",
+                  boxShadow: "0 0 14px #F8F9FB, 0 0 30px #C63A3A",
+                }}
+              />
+            </motion.div>
           </div>
         </motion.div>
       </div>

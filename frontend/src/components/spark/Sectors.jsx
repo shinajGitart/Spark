@@ -10,6 +10,7 @@ import {
   ShieldCheck,
   Boxes,
 } from "lucide-react";
+import SectionLabel from "./SectionLabel";
 
 const sectors = [
   { label: "Oil & Gas", icon: Flame },
@@ -39,9 +40,7 @@ export default function Sectors() {
       <div className="relative max-w-7xl mx-auto px-6">
         <div className="flex items-end justify-between flex-wrap gap-4 mb-12">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full glass text-[11px] uppercase tracking-[0.22em] text-[#D9D9DE]/80">
-              <span className="w-1 h-1 rounded-full bg-[#2F347D]" /> Coverage
-            </div>
+            <SectionLabel accent="#2F347D">Coverage</SectionLabel>
             <h2 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold mt-5">
               Sectors we serve.
             </h2>

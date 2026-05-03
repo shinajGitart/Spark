@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ShieldCheck, Award, Factory } from "lucide-react";
+import SectionLabel from "./SectionLabel";
 
 /**
  * Background slideshow with elegant gradient fallbacks if image files don't exist.
@@ -39,16 +40,19 @@ const cards = [
     icon: Factory,
     title: "Saudi-Based Industrial Partner",
     body: "Headquartered in Dammam, embedded in Saudi Arabia's industrial heartland.",
+    image: "/card-industrial.jpg",
   },
   {
     icon: Award,
     title: "Quality-Driven Supply & Services",
     body: "Premium-grade products, pre-vetted vendors and rigorous quality checkpoints.",
+    image: "/card-quality.jpg",
   },
   {
     icon: ShieldCheck,
     title: "Supporting Major Industrial Sectors",
     body: "From oil & gas and petrochemicals to energy, environment, safety and warehousing.",
+    image: "/card-oilgas.jpg",
   },
 ];
 
@@ -100,9 +104,8 @@ export default function About() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.3 }}
             transition={{ duration: 0.8 }}
-            className="inline-flex items-center gap-2 px-3 py-1 rounded-full glass text-[11px] uppercase tracking-[0.22em] text-[#D9D9DE]/80"
           >
-            <span className="w-1 h-1 rounded-full bg-[#C63A3A]" /> Who We Are
+            <SectionLabel>Who We Are</SectionLabel>
           </motion.div>
           <motion.h2
             initial={{ opacity: 0, y: 30 }}
@@ -129,7 +132,7 @@ export default function About() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.3 }}
             transition={{ duration: 0.9, delay: 0.15 }}
-            className="mt-6 text-[#D9D9DE]/85 max-w-2xl text-base leading-relaxed"
+            className="mt-6 text-[#D9D9DE]/90 max-w-2xl text-base leading-relaxed"
           >
             SPARK Renewable Energy (Sharara) Co. is a Dammam-based supply and
             service company supporting corporate and industrial organizations
@@ -147,21 +150,39 @@ export default function About() {
                 initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.2 }}
-                transition={{ duration: 0.7, delay: idx * 0.12 }}
-                className="group relative p-7 rounded-2xl glass-strong overflow-hidden"
+                transition={{ duration: 0.7, delay: idx * 0.12, ease: [0.22, 1, 0.36, 1] }}
+                className="group relative p-7 rounded-2xl glass-strong overflow-hidden min-h-[260px]"
               >
+                {/* card background image @ ~50% with gradient for readability */}
+                <div
+                  aria-hidden
+                  className="absolute inset-0 rounded-2xl opacity-50 transition-opacity duration-500 group-hover:opacity-60"
+                  style={{
+                    backgroundImage: `url(${c.image})`,
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                  }}
+                />
+                <div
+                  aria-hidden
+                  className="absolute inset-0 rounded-2xl pointer-events-none"
+                  style={{
+                    background:
+                      "linear-gradient(180deg, rgba(9,11,26,0.55) 0%, rgba(9,11,26,0.82) 60%, rgba(9,11,26,0.95) 100%)",
+                  }}
+                />
                 <span
                   className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
                   style={{
                     background:
-                      "linear-gradient(135deg, rgba(198,58,58,0.12), rgba(47,52,125,0.18))",
+                      "linear-gradient(135deg, rgba(198,58,58,0.16), rgba(47,52,125,0.22))",
                   }}
                 />
                 <span
-                  className="absolute -inset-px rounded-2xl pointer-events-none opacity-50 group-hover:opacity-100 transition-opacity"
+                  className="absolute -inset-px rounded-2xl pointer-events-none opacity-60 group-hover:opacity-100 transition-opacity"
                   style={{
                     background:
-                      "linear-gradient(135deg, rgba(198,58,58,0.5), rgba(47,52,125,0.5))",
+                      "linear-gradient(135deg, rgba(198,58,58,0.55), rgba(47,52,125,0.55))",
                     WebkitMask:
                       "linear-gradient(#000,#000) content-box, linear-gradient(#000,#000)",
                     WebkitMaskComposite: "xor",
@@ -169,22 +190,24 @@ export default function About() {
                     padding: 1,
                   }}
                 />
-                <div
-                  className="w-11 h-11 rounded-xl grid place-items-center mb-5"
-                  style={{
-                    background:
-                      "linear-gradient(135deg,#C63A3A22,#2F347D33)",
-                    border: "1px solid rgba(217,217,222,0.12)",
-                  }}
-                >
-                  <Icon size={20} className="text-[#F8F9FB]" />
+                <div className="relative z-10">
+                  <div
+                    className="w-11 h-11 rounded-xl grid place-items-center mb-5"
+                    style={{
+                      background:
+                        "linear-gradient(135deg,#C63A3A33,#2F347D44)",
+                      border: "1px solid rgba(217,217,222,0.18)",
+                    }}
+                  >
+                    <Icon size={20} className="text-[#F8F9FB]" />
+                  </div>
+                  <h3 className="font-display text-lg font-semibold leading-snug">
+                    {c.title}
+                  </h3>
+                  <p className="mt-2.5 text-sm text-[#D9D9DE]/85 leading-relaxed">
+                    {c.body}
+                  </p>
                 </div>
-                <h3 className="font-display text-lg font-semibold leading-snug">
-                  {c.title}
-                </h3>
-                <p className="mt-2.5 text-sm text-[#D9D9DE]/75 leading-relaxed">
-                  {c.body}
-                </p>
               </motion.div>
             );
           })}

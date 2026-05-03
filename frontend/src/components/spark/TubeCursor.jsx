@@ -1,93 +1,105 @@
 import React, { useEffect, useRef } from "react";
 
 /**
- * TubeCursor — real WebGL/WebGPU tubes cursor powered by threejs-components.
- * Loaded dynamically from CDN so no npm install is required.
- *
- * Renders a fixed full-screen canvas behind the page content (pointer-events
- * disabled). Drop-in compatible with the previous TubeCursor API.
+ * TubeCursor — lightweight canvas trail in SPARK brand colors.
+ * Zero external deps. GPU-friendly, handles DPR, pauses when tab hidden.
  */
 export default function TubeCursor({
   initialColors = ["#2F347D", "#27306B", "#A92A2E", "#C63A3A"],
   lightColors = ["#C63A3A", "#A92A2E", "#2F347D", "#F8F9FB"],
   lightIntensity = 220,
-  enableRandomizeOnClick = false,
-  className = "",
 }) {
   const canvasRef = useRef(null);
-  const appRef = useRef(null);
 
   useEffect(() => {
-    let removeClick = null;
-    let destroyed = false;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
 
-    (async () => {
-      try {
-        const mod = await import(
-          /* webpackIgnore: true */
-          "https://cdn.jsdelivr.net/npm/threejs-components@0.0.19/build/cursors/tubes1.min.js"
-        );
-        const TubesCursorCtor = mod.default ?? mod;
-        if (!canvasRef.current || destroyed) return;
+    // Disable on coarse-pointer / small screens (mobile) — battery friendly
+    if (window.matchMedia("(pointer: coarse)").matches) return;
 
-        const app = TubesCursorCtor(canvasRef.current, {
-          tubes: {
-            colors: initialColors,
-            lights: {
-              intensity: lightIntensity,
-              colors: lightColors,
-            },
-          },
-        });
-        appRef.current = app;
+    const ctx = canvas.getContext("2d", { alpha: true });
+    let w = 0, h = 0;
+    const dpr = Math.min(2, Math.max(1, window.devicePixelRatio || 1));
+    const points = [];
+    const maxPoints = 24;
+    let raf;
+    let running = true;
 
-        if (enableRandomizeOnClick) {
-          const handler = () => {
-            const c = randomColors(initialColors.length);
-            const l = randomColors(lightColors.length);
-            app.tubes.setColors(c);
-            app.tubes.setLightsColors(l);
-          };
-          document.body.addEventListener("click", handler);
-          removeClick = () =>
-            document.body.removeEventListener("click", handler);
-        }
-      } catch (err) {
-        // CDN unavailable — fail silently; page still works without cursor fx
-        // eslint-disable-next-line no-console
-        console.warn("[TubeCursor] failed to load", err);
+    const resize = () => {
+      w = window.innerWidth;
+      h = window.innerHeight;
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
+      canvas.style.width = w + "px";
+      canvas.style.height = h + "px";
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
+
+    const onMove = (e) => {
+      points.push({ x: e.clientX, y: e.clientY, life: 1 });
+      if (points.length > maxPoints) points.shift();
+    };
+
+    const tick = () => {
+      if (!running) return;
+      ctx.clearRect(0, 0, w, h);
+      for (let i = 1; i < points.length; i++) {
+        const p0 = points[i - 1];
+        const p1 = points[i];
+        const t = i / points.length;
+        const c1 = initialColors[i % initialColors.length];
+        const c2 = lightColors[i % lightColors.length];
+        const grad = ctx.createLinearGradient(p0.x, p0.y, p1.x, p1.y);
+        grad.addColorStop(0, c1);
+        grad.addColorStop(1, c2);
+        ctx.strokeStyle = grad;
+        ctx.lineWidth = 1.2 + t * 5.5;
+        ctx.shadowColor = c2;
+        ctx.shadowBlur = (lightIntensity / 220) * 18 * t;
+        ctx.lineCap = "round";
+        ctx.beginPath();
+        ctx.moveTo(p0.x, p0.y);
+        ctx.lineTo(p1.x, p1.y);
+        ctx.stroke();
       }
-    })();
+      for (let i = 0; i < points.length; i++) points[i].life *= 0.94;
+      while (points.length && points[0].life < 0.04) points.shift();
+      raf = requestAnimationFrame(tick);
+    };
+
+    const onVis = () => {
+      running = !document.hidden;
+      if (running) raf = requestAnimationFrame(tick);
+    };
+
+    resize();
+    window.addEventListener("resize", resize, { passive: true });
+    window.addEventListener("mousemove", onMove, { passive: true });
+    document.addEventListener("visibilitychange", onVis);
+    raf = requestAnimationFrame(tick);
 
     return () => {
-      destroyed = true;
-      if (removeClick) removeClick();
-      try {
-        appRef.current?.dispose?.();
-        appRef.current = null;
-      } catch {
-        /* ignore */
-      }
+      running = false;
+      cancelAnimationFrame(raf);
+      window.removeEventListener("resize", resize);
+      window.removeEventListener("mousemove", onMove);
+      document.removeEventListener("visibilitychange", onVis);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [initialColors, lightColors, lightIntensity]);
 
   return (
     <canvas
       ref={canvasRef}
       data-testid="tube-cursor"
-      className={`fixed inset-0 block h-full w-full pointer-events-none ${className}`}
-      style={{ zIndex: 30, mixBlendMode: "screen", opacity: 0.6 }}
+      aria-hidden
+      className="pointer-events-none fixed inset-0"
+      style={{
+        zIndex: 30,
+        mixBlendMode: "screen",
+        opacity: 0.75,
+        willChange: "contents",
+      }}
     />
-  );
-}
-
-function randomColors(count) {
-  return new Array(count).fill(0).map(
-    () =>
-      "#" +
-      Math.floor(Math.random() * 16777215)
-        .toString(16)
-        .padStart(6, "0")
   );
 }
