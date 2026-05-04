@@ -204,7 +204,7 @@ export default function Capabilities() {
           color="#B22F32"
           secondaryColor="#2F347D"
           trailOpacity={0.12}
-          particleCount={520}
+          particleCount={380}
           speed={0.7}
         />
       </div>

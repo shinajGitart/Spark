@@ -36,44 +36,44 @@ export default function TubeCursor({
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     };
 
+    // All colors pre-indexed — no per-frame object allocation
+    const allColors = [...initialColors, ...lightColors];
+    let skipMove = false; // mousemove throttle flag
+
     const onMove = (e) => {
+      // Throttle: capture every other mousemove event
+      skipMove = !skipMove;
+      if (skipMove) return;
       points.push({ x: e.clientX, y: e.clientY, life: 1 });
       if (points.length > maxPoints) points.shift();
     };
 
     const tick = () => {
       if (!running) return;
-      ctx.clearRect(0, 0, w, h);
-      for (let i = 1; i < points.length; i++) {
-        const p0 = points[i - 1];
-        const p1 = points[i];
-        const t = i / points.length;
-        const c1 = initialColors[i % initialColors.length];
-        const c2 = lightColors[i % lightColors.length];
-        const grad = ctx.createLinearGradient(p0.x, p0.y, p1.x, p1.y);
-        grad.addColorStop(0, c1);
-        grad.addColorStop(1, c2);
-        ctx.strokeStyle = grad;
-        ctx.lineWidth = 1.0 + t * 3.5;   // max ~4.5 (was up to 6.7)
-        // Only add shadowBlur on the freshest (brightest) segments
-        if (t > 0.6) {
-          ctx.shadowColor = c2;
-          ctx.shadowBlur = t * 8;          // max 8 (was 18)
-        } else {
-          ctx.shadowBlur = 0;
+
+      // Skip draw entirely when trail is empty — zero GPU cost at idle
+      if (points.length > 1) {
+        ctx.clearRect(0, 0, w, h);
+        for (let i = 1; i < points.length; i++) {
+          const p0 = points[i - 1];
+          const p1 = points[i];
+          const t = i / points.length;
+          // Simple solid color — no gradient allocation, no shadowBlur flush
+          ctx.strokeStyle = allColors[i % allColors.length];
+          ctx.lineWidth = 1.0 + t * 3.0;  // max 4.0
+          ctx.lineCap = "round";
+          ctx.globalAlpha = t * 0.7;
+          ctx.beginPath();
+          ctx.moveTo(p0.x, p0.y);
+          ctx.lineTo(p1.x, p1.y);
+          ctx.stroke();
         }
-        ctx.lineCap = "round";
-        ctx.globalAlpha = t * 0.85;        // fade older segments
-        ctx.beginPath();
-        ctx.moveTo(p0.x, p0.y);
-        ctx.lineTo(p1.x, p1.y);
-        ctx.stroke();
+        ctx.globalAlpha = 1;
+        // Decay — vanishes in ~15 frames
+        for (let i = 0; i < points.length; i++) points[i].life *= 0.86;
+        while (points.length && points[0].life < 0.04) points.shift();
       }
-      ctx.shadowBlur = 0;
-      ctx.globalAlpha = 1;
-      // fast decay — trail disappears in ~18 frames instead of ~75
-      for (let i = 0; i < points.length; i++) points[i].life *= 0.88;
-      while (points.length && points[0].life < 0.04) points.shift();
+
       raf = requestAnimationFrame(tick);
     };
 

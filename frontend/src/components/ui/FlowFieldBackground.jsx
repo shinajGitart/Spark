@@ -156,6 +156,10 @@ export default function FlowFieldBackground({
     };
 
     const animate = () => {
+      if (!visible) {
+        animationFrameId = requestAnimationFrame(animate);
+        return;
+      }
       // semi-transparent fill creates the trailing effect
       ctx.globalAlpha = 1;
       ctx.fillStyle = `rgba(9, 11, 26, ${trailOpacity})`;
@@ -182,6 +186,14 @@ export default function FlowFieldBackground({
       mouse.y = -1000;
     };
 
+    // Pause RAF when section is scrolled off-screen — eliminates scroll jank
+    let visible = true;
+    const observer = new IntersectionObserver(
+      ([entry]) => { visible = entry.isIntersecting; },
+      { threshold: 0 }
+    );
+    observer.observe(container);
+
     init();
     animate();
 
@@ -194,6 +206,7 @@ export default function FlowFieldBackground({
       container.removeEventListener("mousemove", handleMouseMove);
       container.removeEventListener("mouseleave", handleMouseLeave);
       cancelAnimationFrame(animationFrameId);
+      observer.disconnect();
     };
   }, [color, secondaryColor, trailOpacity, particleCount, speed]);
 
