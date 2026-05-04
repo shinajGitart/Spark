@@ -8,8 +8,36 @@ import AutoLogo from "../partners/auto.png";
 import EcoLogo from "../partners/eco.png";
 import HeadLogo from "../partners/head.png";
 
+/* ─── Flag badge ─────────────────────────────────────────────────────── */
+/**
+ * Country metadata row — plain inline: flag + country name.
+ * No pill, no badge, no chip. Just clean premium metadata.
+ */
+function FlagBadge({ code, label }) {
+  return (
+    <span className="inline-flex items-center gap-[5px]">
+      <img
+        src={`https://flagcdn.com/20x15/${code}.png`}
+        srcSet={`https://flagcdn.com/40x30/${code}.png 2x`}
+        width={16}
+        height={12}
+        alt={label}
+        className="rounded-[2px] object-cover shrink-0 opacity-85"
+        draggable={false}
+        loading="lazy"
+      />
+      <span
+        className="text-[9px] uppercase tracking-[0.22em] font-medium leading-none"
+        style={{ color: "rgba(217,217,222,0.55)" }}
+      >
+        {label}
+      </span>
+    </span>
+  );
+}
+
 /* ─── Global Partner logo tile ─────────────────────────────────────── */
-function LogoTile({ name, logo, href, accent = "#C63A3A" }) {
+function LogoTile({ name, logo, href, accent = "#C63A3A", flags = [] }) {
   return (
     <a
       href={href}
@@ -17,10 +45,8 @@ function LogoTile({ name, logo, href, accent = "#C63A3A" }) {
       rel="noopener noreferrer"
       aria-label={`Visit ${name}`}
       data-testid={`logo-tile-${name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}
-      className="group relative flex items-center justify-center pl-4 pr-4 py-3 rounded-xl glass min-w-[220px] h-[66px] transition-all duration-300 hover:-translate-y-0.5 hover:border-[rgba(217,217,222,0.28)] cursor-pointer no-underline"
-      style={{
-        boxShadow: "none",
-      }}
+      className="group relative flex flex-col justify-between pl-4 pr-4 pt-4 pb-3 rounded-xl glass min-w-[230px] h-[96px] transition-all duration-300 hover:-translate-y-0.5 hover:border-[rgba(217,217,222,0.28)] cursor-pointer no-underline overflow-hidden"
+      style={{ boxShadow: "none" }}
       onMouseEnter={(e) => {
         e.currentTarget.style.boxShadow = `0 0 18px ${accent}44, 0 4px 24px rgba(0,0,0,0.35)`;
       }}
@@ -28,20 +54,45 @@ function LogoTile({ name, logo, href, accent = "#C63A3A" }) {
         e.currentTarget.style.boxShadow = "none";
       }}
     >
-      {/* subtle accent shimmer on hover */}
+      {/* accent shimmer on hover */}
       <span
         aria-hidden
         className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
         style={{
-          background: `radial-gradient(ellipse at 50% 50%, ${accent}18, transparent 70%)`,
+          background: `radial-gradient(ellipse at 50% 40%, ${accent}16, transparent 70%)`,
         }}
       />
-      <img
-        src={logo}
-        alt={name}
-        className="relative max-h-[38px] max-w-[150px] w-auto h-auto object-contain brightness-100 group-hover:brightness-110 transition-all duration-300"
-        draggable={false}
-      />
+
+      {/* ── Logo zone — centred in the upper portion ── */}
+      <div className="relative flex items-center justify-center flex-1">
+        <img
+          src={logo}
+          alt={name}
+          className="max-h-[40px] max-w-[160px] w-auto h-auto object-contain brightness-100 group-hover:brightness-110 transition-all duration-300"
+          draggable={false}
+        />
+      </div>
+
+      {/* ── Flag zone — clean metadata row at the bottom ── */}
+      {flags.length > 0 && (
+        <div
+          className="relative flex items-center gap-3 mt-2 pt-2"
+          style={{ borderTop: "1px solid rgba(217,217,222,0.08)" }}
+        >
+          {flags.map((f, idx) => (
+            <React.Fragment key={f.code}>
+              {idx > 0 && (
+                <span
+                  aria-hidden
+                  className="w-px h-3 shrink-0"
+                  style={{ background: "rgba(217,217,222,0.2)" }}
+                />
+              )}
+              <FlagBadge code={f.code} label={f.label} />
+            </React.Fragment>
+          ))}
+        </div>
+      )}
     </a>
   );
 }
@@ -105,30 +156,38 @@ const globalsData = [
     logo: KaydonLogo,
     href: "https://www.kaydonfiltration.com/",
     accent: "#C63A3A",
+    flags: [{ code: "us", label: "USA" }],
   },
   {
     name: "Central Automotive Products",
     logo: CentralLogo,
     href: "https://www.central-auto.co.jp/en/index.html",
     accent: "#2F347D",
+    flags: [{ code: "jp", label: "Japan" }],
   },
   {
     name: "Autonomy Dynamics",
     logo: AutoLogo,
     href: "https://autonomydynamics.com/en/",
     accent: "#27306B",
+    flags: [{ code: "jp", label: "Japan" }],
   },
   {
     name: "Eco Environmental",
     logo: EcoLogo,
     href: "https://eco.yikeou.com/",
     accent: "#C63A3A",
+    flags: [
+      { code: "cn", label: "China" },
+      { code: "jp", label: "Japan" },
+    ],
   },
   {
     name: "Chubu Techno",
     logo: HeadLogo,
     href: "https://en.c-techno.co.jp/",
     accent: "#A92A2E",
+    flags: [{ code: "jp", label: "Japan" }],
   },
 ];
 
@@ -153,7 +212,6 @@ const vendorsData = [
 
 /* ─── Marquee ────────────────────────────────────────────────────────── */
 function Marquee({ items, direction = "forward", speed = 70, type = "vendor" }) {
-  // duplicate for seamless loop
   const arr = [...items, ...items];
   const cls =
     direction === "forward" ? "marquee-track-fwd" : "marquee-track-rev";
@@ -172,6 +230,7 @@ function Marquee({ items, direction = "forward", speed = 70, type = "vendor" }) 
                 logo={b.logo}
                 href={b.href}
                 accent={b.accent}
+                flags={b.flags || []}
               />
             ))
           : arr.map((b, i) => (
