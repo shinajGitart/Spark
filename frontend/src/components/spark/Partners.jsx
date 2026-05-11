@@ -261,11 +261,42 @@ export default function Partners() {
       data-testid="partners-section"
       className="relative py-28 overflow-hidden"
     >
+      {/* ── Lifted premium dark base — makes logos visually clear ── */}
       <div
-        className="absolute inset-0 pointer-events-none opacity-60"
+        className="absolute inset-0 pointer-events-none"
         style={{
           background:
-            "radial-gradient(60% 50% at 50% 100%, rgba(47,52,125,0.2), transparent 70%)",
+            "linear-gradient(180deg, #090B1A 0%, #0D1024 20%, #11152B 50%, #1A2040 75%, #0D1024 90%, #090B1A 100%)",
+        }}
+      />
+      {/* subtle red edge glow — left */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(50% 60% at 0% 50%, rgba(198,58,58,0.08), transparent 70%)",
+        }}
+      />
+      {/* subtle blue edge glow — right */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(50% 60% at 100% 50%, rgba(47,52,125,0.10), transparent 70%)",
+        }}
+      />
+      {/* soft top vignette so the section blends with the section above */}
+      <div
+        className="absolute inset-x-0 top-0 h-32 pointer-events-none"
+        style={{
+          background: "linear-gradient(to bottom, #090B1A, transparent)",
+        }}
+      />
+      {/* soft bottom vignette */}
+      <div
+        className="absolute inset-x-0 bottom-0 h-32 pointer-events-none"
+        style={{
+          background: "linear-gradient(to top, #090B1A, transparent)",
         }}
       />
 

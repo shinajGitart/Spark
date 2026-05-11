@@ -58,6 +58,10 @@ body::before {
     radial-gradient(60% 60% at 50% 50%, rgba(248,249,251,0.035), transparent 75%);
 }
 
+body.proposal-light-theme::before {
+  display: none;
+}
+
 .font-display { font-family: 'Sora', sans-serif; letter-spacing: -0.02em; }
 .font-body { font-family: 'Manrope', sans-serif; }
 
@@ -192,6 +196,23 @@ body::before {
   }
 }
 
-@layer base {
-  * { @apply border-border; }
+
+/* ── Scroll performance ── */
+/* Promote compositor layers for elements animated during scroll */
+.sweep {
+  will-change: transform;
+  contain: strict;
+}
+.marquee-track-fwd,
+.marquee-track-rev {
+  will-change: transform;
+  contain: layout style;
+}
+
+/* Ensure no custom cursor leaks from any component */
+*, *::before, *::after {
+  cursor: auto;
+}
+a, button, [role="button"], [tabindex], label {
+  cursor: pointer;
 }
