@@ -387,28 +387,58 @@ export default function Capabilities() {
       data-testid="capabilities-section"
       className="relative py-24 lg:py-32 overflow-hidden"
     >
-      {/* Flow-field particle background */}
-      <div className="absolute inset-0 z-0 pointer-events-none" style={{ opacity: 0.52 }}>
+      {/* ── Lifted dark-premium base — removes flat-black feel ── */}
+      <div
+        className="absolute inset-0 z-0 pointer-events-none"
+        style={{
+          background:
+            "linear-gradient(160deg, #0D1024 0%, #11152B 30%, #151A33 55%, #11152B 75%, #0D1024 100%)",
+        }}
+      />
+
+      {/* Flow-field particle animation — clean red/blue lines, no fog, no white */}
+      <div className="absolute inset-0 z-[1] pointer-events-none" style={{ opacity: 0.72 }}>
         <FlowFieldBackground
-          color="#B22F32"
+          color="#C63A3A"
           secondaryColor="#2F347D"
-          trailOpacity={0.12}
-          particleCount={380}
-          speed={0.7}
+          trailOpacity={0.40}
+          particleCount={140}
+          speed={0.65}
+          enableSparks={false}
+          enableGlowLayer={false}
+          mouseRepulsion={false}
         />
       </div>
 
-      {/* dark overlay */}
+      {/* Soft red ambient glow — centre-left, behind content */}
       <div
-        className="absolute inset-0 z-[1] pointer-events-none"
-        style={{ background: "rgba(9,11,26,0.48)" }}
-      />
-      <div
-        className="absolute inset-0 z-[2] pointer-events-none opacity-60"
+        className="absolute inset-0 z-[2] pointer-events-none"
         style={{
           background:
-            "radial-gradient(60% 50% at 50% 0%, rgba(47,52,125,0.18), transparent 70%)",
+            "radial-gradient(55% 45% at 20% 55%, rgba(198,58,58,0.13), transparent 70%)",
         }}
+      />
+      {/* Soft blue ambient glow — centre-right */}
+      <div
+        className="absolute inset-0 z-[2] pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(55% 45% at 80% 40%, rgba(47,52,125,0.15), transparent 70%)",
+        }}
+      />
+      {/* Top-centre blue lift — lifts the heading area */}
+      <div
+        className="absolute inset-0 z-[2] pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(70% 35% at 50% 0%, rgba(47,52,125,0.22), transparent 65%)",
+        }}
+      />
+
+      {/* Reduced dark overlay — just enough to keep text crisp, not enough to kill particles */}
+      <div
+        className="absolute inset-0 z-[3] pointer-events-none"
+        style={{ background: "rgba(9,11,26,0.28)" }}
       />
 
       <div className="relative z-10 max-w-7xl mx-auto px-6">

@@ -7,6 +7,9 @@ export default function FlowFieldBackground({
   trailOpacity = 0.12,
   particleCount = 520,
   speed = 0.7,
+  enableSparks = true,
+  enableGlowLayer = true,
+  mouseRepulsion = true,
 }) {
   const canvasRef = useRef(null);
   const containerRef = useRef(null);
@@ -58,15 +61,17 @@ export default function FlowFieldBackground({
         this.vx += Math.cos(angle) * 0.22 * speed;
         this.vy += Math.sin(angle) * 0.22 * speed;
 
-        // mouse repulsion — tight local zone only, no wide-area drag
-        const dx = mouse.x - this.x;
-        const dy = mouse.y - this.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        const IR = 75;                      // was 160 — now only reacts up close
-        if (dist < IR) {
-          const force = (IR - dist) / IR;
-          this.vx -= dx * force * 0.022;   // was 0.045 — much gentler push
-          this.vy -= dy * force * 0.022;
+        // mouse repulsion — only when mouseRepulsion is true
+        if (mouseRepulsion) {
+          const dx = mouse.x - this.x;
+          const dy = mouse.y - this.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          const IR = 75;
+          if (dist < IR) {
+            const force = (IR - dist) / IR;
+            this.vx -= dx * force * 0.022;
+            this.vy -= dy * force * 0.022;
+          }
         }
 
         this.x += this.vx;
@@ -91,10 +96,11 @@ export default function FlowFieldBackground({
 
         const baseColor = this.useSecondary ? secondaryColor : color;
 
-        // very rare white highlight — tiny dot, very dim, no shadow
+        // very rare white highlight — only when enableSparks is true
         if (this.isSpark) {
+          if (!enableSparks) return; // skip entirely when disabled
           if (alpha < 0.15) return;
-          context.globalAlpha = alpha * 0.18;
+          context.globalAlpha = alpha * 0.28;
           context.fillStyle = "#F8F9FB";
           context.beginPath();
           context.arc(this.x, this.y, 0.9, 0, Math.PI * 2);
@@ -107,20 +113,22 @@ export default function FlowFieldBackground({
         const segLen = Math.hypot(this.x - this.px, this.y - this.py);
         if (segLen > 20) return;
 
-        // soft glow layer — wider stroke at very low alpha (NO shadowBlur)
-        context.globalAlpha = alpha * 0.18;
-        context.strokeStyle = baseColor;
-        context.lineWidth = this.useSecondary ? 3.5 : 4.5;
-        context.lineCap = "round";
-        context.beginPath();
-        context.moveTo(this.px, this.py);
-        context.lineTo(this.x, this.y);
-        context.stroke();
+        // soft glow layer — only when enableGlowLayer is true
+        if (enableGlowLayer) {
+          context.globalAlpha = alpha * 0.30;
+          context.strokeStyle = baseColor;
+          context.lineWidth = this.useSecondary ? 4.0 : 5.5;
+          context.lineCap = "round";
+          context.beginPath();
+          context.moveTo(this.px, this.py);
+          context.lineTo(this.x, this.y);
+          context.stroke();
+        }
 
         // core line — crisp, fully saturated color
-        context.globalAlpha = alpha * 0.72;
+        context.globalAlpha = alpha * 0.88;
         context.strokeStyle = baseColor;
-        context.lineWidth = this.useSecondary ? 0.9 : 1.1;
+        context.lineWidth = this.useSecondary ? 0.9 : 1.2;
         context.beginPath();
         context.moveTo(this.px, this.py);
         context.lineTo(this.x, this.y);
@@ -129,10 +137,10 @@ export default function FlowFieldBackground({
         context.globalAlpha = 1;
 
         // small accent dot at particle head
-        context.globalAlpha = alpha * 0.55;
+        context.globalAlpha = alpha * 0.70;
         context.fillStyle = baseColor;
         context.beginPath();
-        context.arc(this.x, this.y, this.useSecondary ? 0.9 : 1.1, 0, Math.PI * 2);
+        context.arc(this.x, this.y, this.useSecondary ? 0.9 : 1.2, 0, Math.PI * 2);
         context.fill();
         context.globalAlpha = 1;
       }
@@ -213,7 +221,7 @@ export default function FlowFieldBackground({
   return (
     <div
       ref={containerRef}
-      className={`absolute inset-0 w-full h-full overflow-hidden bg-[#090B1A] ${className}`}
+      className={`absolute inset-0 w-full h-full overflow-hidden ${className}`}
     >
       <canvas ref={canvasRef} className="block w-full h-full" />
     </div>
